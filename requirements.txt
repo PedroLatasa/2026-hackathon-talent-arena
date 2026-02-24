@@ -1,0 +1,15 @@
+transformers
+peft
+datasets
+pandas
+python-dotenv
+jupyter
+notebook
+ipykernel
+torch
+accelerate
+bitsandbytes
+scikit-learn
+seaborn
+matplotlib
+tqdm
