@@ -1,6 +1,8 @@
 import pandas as pd
 import re
 import json
+from datasets import load_dataset
+import os
 
 
 
@@ -23,7 +25,50 @@ def load_data(file_path, **args):
         print(f"Error loading data: {e}")
         return None
 
+
+def download_hf_dataset(dataset_name, save_path, split="train", **kwargs):
+    """
+    Descarga un dataset desde Hugging Face y lo guarda en local en formato JSON.
     
+    Esta función facilita la obtención de datasets públicos o privados 
+    desde el Hugging Face Hub, convirtiéndolos a DataFrame y guardándolos
+    en disco con una estructura similar a los archivos JSON que ya utilizamos.
+    
+    Args:
+        dataset_name (str): El nombre del dataset en el Hub (ej: "tatsu-lab/alpaca").
+        save_path (str): Ruta donde guardar el archivo JSON (ej: "data/dataset.json").
+        split (str, opcional): El split a descargar ("train", "test", etc.). Por defecto "train".
+        **kwargs: Argumentos extra para `load_dataset` (ej. `token=True` para repositorios privados).
+        
+    Returns:
+        pd.DataFrame: DataFrame con los datos, o None si hay algún error.
+    """
+    try:
+        
+        print(f"Descargando el dataset '{dataset_name}' (split: {split})...")
+        dataset = load_dataset(dataset_name, split=split, **kwargs)
+        df = dataset.to_pandas()
+        
+        # Asegurarse de que el directorio donde queremos guardarlo existe
+        save_dir = os.path.dirname(save_path)
+        if save_dir:
+            os.makedirs(save_dir, exist_ok=True)
+            
+        # Guardar como JSON con estructura de lista de registros (orient='records')
+        df.to_json(save_path, orient='records', indent=4, force_ascii=False)
+        print(f"Dataset guardado exitosamente en: {save_path}")
+        
+        return df
+        
+    except ImportError:
+        print("Error: Necesitas la librería 'datasets'. Instálala ejecutando 'pip install datasets'.")
+        return None
+    except Exception as e:
+        print(f"Error al descargar el dataset desde Hugging Face: {e}")
+        return None
+
+
+
 def prepare_dataset(df):
     """
     Prepara y estructura el dataset crudo para las pruebas del hackathon.
