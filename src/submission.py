@@ -32,7 +32,7 @@ class Submission:
         df = load_data(self.input_file)
         return df
 
-    def create_robustness_dataset(self) -> Dataset:
+    def create_robustness_dataset(self, df_input: pd.DataFrame = None) -> Dataset:
         """
         Crea un dataset con distintas variaciones de ruido o corrupción 
         (typos, errores gramaticales, etc.) aplicadas a los prompts originales
@@ -75,7 +75,8 @@ class Submission:
         }
 
         # Extraemos los prompts del df de entrada
-        df_input = self.read_input_file()
+        if df_input is None:
+            df_input = self.read_input_file()
         if self.pred_col not in df_input.columns:
             raise ValueError(f"La columna {self.pred_col} no existe en el archivo de entrada.")
         prompts = df_input[self.pred_col].tolist()
@@ -162,14 +163,28 @@ class Submission:
         Returns:
             pd.DataFrame: DataFrame con la versión final que se subirá a la plataforma.
         """
-        # TODO / OJO: system_prompt y absolute_prompt son recibidos como parámetros, 
-        # pero no se están aplicando en los prompts finales dentro de este pipeline.
-        # Si la columna self.pred_col (input_prompt) no incluye ya el formateo, 
-        # probablemente tengas que inyectarlo aquí  (quizás usando data_utils.format_instruction)
-        # o un .map() extra sobre el dataset antes de pasarlo a model_preds_robustness.
-
         df = self.read_input_file()
-        df_robustness = self.create_robustness_dataset()
+        
+        from data_utils import format_instruction
+        
+        # Aplicamos el formateo a cada prompt
+        formatted_prompts = []
+        for _, row in df.iterrows():
+            
+            # Ajuste de las claves para 'format_instruction' según el nuevo esquema
+            sample = {
+                'category_name': row.get('category', ''),
+                'challenge': row.get('challenge', ''),
+                'question': row.get('question', ''),
+                'answer': row.get('last_interaction', ''), 
+                'proposed_answer': row.get('corrected_response_validated', '')
+            }
+            f_instr = format_instruction(sample, system_prompt, absolute_prompt, output_col=self.pred_col)
+            formatted_prompts.append(f_instr[self.pred_col])
+            
+        df[self.pred_col] = formatted_prompts
+        
+        df_robustness = self.create_robustness_dataset(df_input=df)
         
         # Debemos asegurar que conservamos el "id" original para poder usarlo después en indexación
         if "id" in df.columns:
