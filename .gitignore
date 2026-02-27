@@ -21,9 +21,10 @@ output/
 # Regla para la carpeta data:
 # 1. Ignoramos todo el contenido de la carpeta
 data/*
-# 2. Creamos la excepción para el archivo que quieres mantener
+# 2. Creamos la excepción para los archivos que quieres mantener
 !data/dataset_sample.json
+#!data/validation_dataset_sample.json
 
-# Ocultamos la evaluación del participante
-scripts/generate_ground_truth.py
+# Ocultamos la evaluación y generación de datos del participante
+scripts/
 data/validation_dataset.json
