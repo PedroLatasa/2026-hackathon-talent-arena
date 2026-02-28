@@ -50,7 +50,7 @@ def get_model_and_tokenizer(model_name="prometheus-eval/prometheus-7b-v2.0" ):
 
 
     
-def split_model_reason_result(sample, output_suffix = "model"):
+def split_model_reason_result(sample, output_suffix : str = "model", input_col: str = "model_output")->dict:
     """
     Post-procesa la salida del modelo para separar la explicación de la puntuación.
     
@@ -58,12 +58,15 @@ def split_model_reason_result(sample, output_suffix = "model"):
     asume que todo el texto es el razonamiento y devuelve un resultado nulo.
 
     Args:
-        sample (dict): Ejemplo que contiene 'model_output'.
+        sample (dict | str): Ejemplo que contiene 'model_output'.
+        output_suffix (str): Sufijo para nombrar la columna de salida.
+        input_col (str): Nombre de la columna de entrada.
 
     Returns:
         dict: Diccionario con las claves 'reason' (explicación) y 'result' (puntuación limpia).
     """
-    output = sample.get("model_output", "")
+
+    output = sample.get(input_col, "") if not isinstance(sample, str) else sample
     
     if "[RESULT]" in output:
         # Dividimos por la última aparición del tag para evitar errores
@@ -125,7 +128,7 @@ def model_predict(model, tokenizer, prompt, max_new_tokens =200, temperature=0.7
 
 
 def model_predict_batched(model, tokenizer, batch, input_col = "user_content", 
-                            temperature = 0.1, max_new_tokens = 1000, output_suffix = "model"):
+                            temperature = 0.1, max_new_tokens = 1000, completion_colname = "model_output"):
     """
     Realiza inferencia en lotes (batches) sobre un conjunto de prompts.
     
@@ -140,12 +143,12 @@ def model_predict_batched(model, tokenizer, batch, input_col = "user_content",
         input_col (str, opcional): El nombre de la columna que contiene los prompts de usuario. Por defecto "user_content".
         temperature (float, opcional): Parámetro de temperatura para controlar la aleatoriedad. Por defecto 0.1.
         max_new_tokens (int, opcional): Límite máximo de tokens a generar. Por defecto 1000.
-        output_suffix (str, opcional): Sufijo para la clave del diccionario de salida. Por defecto "model".
+        completion_colname (str, opcional): Nombre de la columna de salida. Por defecto "model_output".
         
     Returns:
-        dict: Diccionario que contiene una lista con las respuestas generadas bajo la clave f"{output_suffix}_output".
+        dict: Diccionario que contiene una lista con las respuestas generadas bajo la clave f"{completion_colname}".
     """
-    # 1. Detectamos el dispositivo de entrada (donde está la primera capa)
+    # 1. Detectamos el dispositivo de entrada (donde está la primera c  apa)
     model_device = model.device 
     
     messages_list = [[{"role": "user", "content": p}] for p in batch[input_col]]
@@ -176,7 +179,7 @@ def model_predict_batched(model, tokenizer, batch, input_col = "user_content",
         skip_special_tokens=True
     )
     
-    return {f"{output_suffix}_output": decoded_outputs}
+    return {f"{completion_colname}": decoded_outputs}
 
 
 

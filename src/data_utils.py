@@ -46,7 +46,9 @@ def prepare_dataset(df):
         
     qa_last_messages = df["raw"].apply(lambda x: get_last_valid_turn(x["messages"])).apply(pd.Series)
     
-    df = pd.concat([df[["verdict","challenge","proposed_answer"]], qa_last_messages],axis=1)
+    df["category_name"] = df.category.map(lambda x: x.get("name"))
+
+    df = pd.concat([df[["verdict","challenge","category_name","proposed_answer"]], qa_last_messages],axis=1)
     # cuando el verdict es passed, la gente no introduce una proposed_answer, pero es adecuado tener la misma que la que ha hecho el modelo
     # bien para el llm como juez
     
