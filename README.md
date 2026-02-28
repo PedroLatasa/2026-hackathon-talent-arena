@@ -56,18 +56,18 @@ Para maximizar tus resultados durante el hackathon, el reto consta de las siguie
 2. **Exploración de Datos**: Inspecciona y entiende los datos en `notebooks/01_eda.ipynb`.
 3. **Fine-Tuning del Modelo**: Entrena y ajusta el modelo en `notebooks/02_finetuning.ipynb`. (Nota que al final del notebook hay sugerencias para iterar y mejorar el modelo).
 4. **Evaluación de la Robustez**: Evalúa la robustez del modelo ajustado en `notebooks/03_robustness.ipynb`. 
+5. **Evaluación y Entrega**: Evalúa y entrega los resultados en `notebooks/04_submission.ipynb`. 
+
+**SE PUEDE MODIFICAR TODO LO QUE SE QUIERA DEL REPOSITORIO**
 
 ### Terminado el reto: Evaluación y Entrega
 
 Una vez concluido el desarrollo:
 
 - Se os pasará un **dataset de test**, del cual deberéis devolver las predicciones del modelo en formato JSON. 
-- El JSON de test que se os proporciona tiene las etiquetas `"id"` y `"user_prompt"` por observación. 
-- Debéis completarlo entregando un JSON que contenga, además, las siguientes claves por cada observación:
-  - `"model_pred"`
-  - `"model_reason"`
-  - `"model_pred_typos"`
-  - `"model_reason_typos"`
+- El JSON de test que se os proporciona tiene las mismas etiquetas que el json pero sin verdict (el target). 
+- Deberéis de generar el fichero
+
 - **Criterios de Evaluación**:
   - Se evaluará principalmente el **accuracy** entre el valor real y el valor predicho por el modelo (clasificando si es un texto OK o no de entrada).
   - Se valorará positivamente si `"model_pred"` y `"model_pred_typos"` coinciden, lo cual indicaría que el modelo fine-tuneado es más robusto ante errores.
