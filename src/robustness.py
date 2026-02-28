@@ -1,5 +1,6 @@
 from datasets import Dataset
-
+import pandas as pd
+from model_utils import model_predict_batched, split_model_reason_result
 
 def create_robustness_dataset(df_input: pd.DataFrame = None, pred_col="user_content") -> Dataset:
     """
@@ -60,7 +61,7 @@ def create_robustness_dataset(df_input: pd.DataFrame = None, pred_col="user_cont
 
     return dataset
 
-def model_preds(model, tokenizer, dataset: Dataset, input_col: str, suffix: str) -> Dataset:
+def model_preds(model, tokenizer, dataset: Dataset, input_col: str, output_suffix: str) -> Dataset:
         """
         Genera las predicciones para una columna en específico del dataset y formatea la salida
         (razonamiento vs puntuación).
@@ -70,25 +71,24 @@ def model_preds(model, tokenizer, dataset: Dataset, input_col: str, suffix: str)
             tokenizer: Tokenizador del modelo.
             dataset (Dataset): Dataset con los inputs.
             input_col (str): Nombre de la columna de entrada.
-            suffix (str): Sufijo para nombrar la columna de salida.
+            output_suffix (str): Sufijo para nombrar la columna de salida.
 
         Returns:
             Dataset: Dataset con las nuevas columnas calculadas.
         """
+        
+        
+        completion_colname = f"{output_suffix}_completion"
+
         dataset = dataset.map(
-            model_predict_batched, 
+            lambda batch: model_predict_batched(batch = batch, model = model, tokenizer = tokenizer,  input_col = input_col, completion_colname = completion_colname), 
             batched=True, 
-            batch_size=8, 
-            fn_kwargs={
-                "model": model, 
-                "tokenizer": tokenizer, 
-                "input_col": input_col, 
-                "output_suffix": suffix
-            }
+            batch_size=8
         )
+        
         dataset = dataset.map(
             split_model_reason_result, 
-            fn_kwargs={"output_suffix": suffix}
+            fn_kwargs={"output_suffix": output_suffix, "input_col": completion_colname}
         )
         return dataset
 
@@ -111,7 +111,7 @@ def model_preds_robustness(model, tokenizer, dataset: Dataset) -> Dataset:
         create_suffix = lambda x: "".join([p[0] for p in x.split("_")[:2]]) + "_m"
         col_and_suffix = [(col, create_suffix(col)) for col in cols]
 
-        for col, suffix in col_and_suffix:
-            dataset = model_preds(model, tokenizer, dataset, col, suffix)
+        for col, output_suffix in col_and_suffix:
+            dataset = model_preds(model, tokenizer, dataset, col, output_suffix)
         
         return dataset

@@ -1,12 +1,5 @@
-.venv/
-__pycache__/
-*.pyc
-.env
-.ipynb_checkpoints/
-output/
-data/*
-!data/dataset_sample.json# Entornos virtuales y caché
-.venv/
+.venv
+.venv.*
 __pycache__/
 *.pyc
 
