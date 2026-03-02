@@ -60,7 +60,7 @@ Sigue estos pasos para preparar tu entorno de trabajo de manera eficiente:
    Creamos y activamos un entorno Conda optimizado para el reto.
    ```bash
    conda env create -f conda.yaml
-   conda activate sft_hackathon_env
+   source activate sft_hackathon_alia_env
    python -m ipykernel install --user --name sft_hackathon_alia_env --display-name "Python 3.11 (Hackathon ALIA)"
    ```
 
