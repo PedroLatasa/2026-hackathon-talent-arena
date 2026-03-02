@@ -1,19 +1,20 @@
 # ⚔️ Prometheus LLM-as-a-Judge: Hackathon Talent Arena
 
-Bienvenido al repositorio oficial para el reto de **Fine-Tuning de Prometheus**. En este proyecto, exploraremos cómo utilizar y adaptar modelos de lenguaje especializados en evaluación (LLM-as-a-Judge) para detectar comportamientos inadecuados en interacciones de IA.
+Bienvenido al repositorio oficial para el reto de **Fine-Tuning de un LLM as a judge**. En este proyecto, exploraremos cómo utilizar y adaptar modelos de lenguaje especializados en evaluación (LLM-as-a-Judge) para detectar comportamientos inadecuados en interacciones de IA.
 
 ---
 
 ## 🎯 Objetivo del Reto
 
-El propósito principal es entrenar un **modelo Juez** capaz de discernir de manera precisa si una interacción entre un usuario y un modelo de lenguaje es **adecuada** o **inadecuada**.
+El propósito principal es entrenar un **modelo Juez** capaz de discernir de manera precisa si una interacción entre un usuario y un modelo de lenguaje es **adecuada** o **inadecuada**. Por defecto, se ha puesto Prometheus-7b-v2.0 como modelo base, pero como participante eres libre de usar cualquier otro.
 
 ### El Contexto
 Los datos provienen de un reto previo donde usuarios intentaron "romper" modelos de lenguaje (Jailbreaking). 
 - **Verdict "passed":** El modelo resistió el ataque y respondió de forma segura.
 - **Verdict "failed":** El usuario logró que el modelo generara una respuesta inadecuada.
 
-Tu misión es ajustar **Prometheus-7b-v2.0** para que actúe como un evaluador crítico y robusto, capaz de identificar estos fallos incluso ante variaciones en el input. Para más detalles técnicos, consulta la **[descripción detallada del dataset en docs/dataset.md](docs/dataset.md)**.
+Tu misión es ajustar el **LLM as a judge** para que actúe como un evaluador crítico y robusto, capaz de identificar estos fallos incluso ante variaciones en el input. Para más detalles técnicos, consulta la **[descripción detallada del dataset en docs/dataset.md](docs/dataset.md)**.
+Deberá responder de la manera más exacta, si un texto es inadecuado o adecuado en base a los datos compartidos.
 
 ---
 
@@ -94,7 +95,7 @@ Al finalizar el tiempo, se proporcionará un **Dataset de Test**. Deberás proce
 ---
 
 ## 📝 Notas Adicionales
-- Modelo Base: `prometheus-eval/prometheus-7b-v2.0`
+- Modelo Base: Por defecto en los notebooks, se ha puesto `prometheus-eval/prometheus-7b-v2.0`, aunque es posible cambiar el modelo a otro juez de libre elección.
 - **Libertad Total**: Tienes permiso para modificar cualquier parte del código, añadir librerías o cambiar la lógica de preprocesamiento para mejorar tus resultados.
 
 ---
@@ -105,7 +106,7 @@ Al finalizar el tiempo, se proporcionará un **Dataset de Test**. Deberás proce
 
 ### 1. Perfecciona el Prompt (Prompt Engineering)
 El Juez es tan bueno como su rúbrica.
-- **Rúbricas Explícitas**: Revisa `src/prompts.py`. Asegúrate de que Prometheus entienda exactamente qué constituye un fallo de seguridad.
+- **Rúbricas Explícitas**: Revisa `src/prompts.py`. Asegúrate de que Prometheus (o el modelo seleccionado) entienda exactamente qué constituye un fallo de seguridad.
 - **Historial de Conversación**: Evaluar solo el último mensaje puede ser insuficiente. Prueba a incluir el contexto previo para detectar ataques multiturno.
 - **Few-Shot Prompting**: Provee ejemplos de respuestas ideales (*Reference Answers*) dentro del prompt para guiar el juicio del modelo.
 
@@ -126,6 +127,7 @@ El Juez es tan bueno como su rúbrica.
 ### Prometheus & LLM-as-a-Judge
 - [Prometheus 2: Open-Source Language Models for Evaluation](https://github.com/prometheus-eval/prometheus-eval)
 - [Haystack Cookbook: Prometheus 2 Evaluation](https://colab.research.google.com/github/deepset-ai/haystack-cookbook/blob/main/notebooks/prometheus2_evaluation.ipynb)
+- [Awesome LLM-as-a-Judge](https://github.com/llm-as-a-judge/Awesome-LLM-as-a-judge)
 
 ### Tutoriales de Fine-Tuning
 - [Mistral 7B Fine-Tuning Tutorial (DataCamp)](https://www.datacamp.com/es/tutorial/mistral-7b-tutorial)
